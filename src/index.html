@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <title>Face Recognition</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <style type="text/css">
+        div {
+            /*border: 2px solid black;*/
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+<div id="main" class="w-full h-screen flex flex-row justify-evenly items-stretch flex-nowrap text-sm">
+    <div id="leftColumn" class="basis-4/5 flex-row">
+        <div id="leftBlock" class="basis-1/2 flex-col">
+            <div id="leftTopdiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 ml-4 bg-opacity-70 transition-all">
+                <img id="imgRef" src="" alt="비교 이미지" class="max-w-full h-auto object-contain" style="display: none;">
+            </div>
+            <div id="leftBottomDiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 ml-4 bg-opacity-70 transition-all">
+                <img id="imgTarg" src="" alt="대상 이미지" class="max-w-full h-auto object-contain" style="display: none;">
+            </div>
+        </div>
+        <div id="rightBlock" class="basis-1/2 flex-col">
+            <div id="rightTopDiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 bg-opacity-70 transition-all">
+                <p id="dirTarg"></p>
+            </div>
+            <div id="rightBottomDiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 bg-opacity-70 transition-all">
+                <img id="imgCrop" src="" alt="결과 이미지" class="max-w-full h-auto object-contain" style="display: none;">
+            </div>
+
+        </div>
+    </div>
+    <div id="rightColumn" class="flex-col basis-1/5 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 mr-4 bg-opacity-70 transition-all">
+        <button id="buttonRef" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">비교 파일 불러오기</button>
+        <button id="buttonTarg" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">대상 파일 불러오기</button>
+        <button id="buttonOut" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">추출 폴더 선택하기</button>
+        <button id="buttonStart" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">추출 시작</button>
+        <select class="config border rounded-sm p-2 w-full text-sm" id="modelSelect">
+            <option value="ArcFace">ArcFace(권장)</option>
+            <option value="DeepFace">DeepFace</option>
+            <option value="DeepID">DeepID</option>
+            <option value="Dlib">Dlib</option>
+            <option value="Facenet">Facenet</option>
+            <option value="Facenet512">Facenet512</option>
+            <option value="GhostFaceNet">GhostFaceNet</option>
+            <option value="OpenFace">OpenFace</option>
+            <option value="SFace">SFace</option>
+            <option value="VGG-Face">VGG-Face</option>
+        </select>
+    </div>
+</div>
+<script>
+    let refImgPath = null; // 첫 번째 인자: Reference 이미지 경로
+    let targDirPath = null;  // 두 번째 인자: Target 폴더 경로
+    let outDirPath = null;  // 세 번째 인자: 출력 폴더 경로
+
+    // 1. Reference 이미지 선택
+    document.getElementById('buttonRef').addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*'; // 이미지 파일만 허용
+        input.onchange = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                refImgPath = file.path; // 경로 저장
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imgElement = document.getElementById('imgRef');
+                    imgElement.src = e.target.result; // Base64로 미리보기
+                    imgElement.style.display = 'block';
+                    // document.querySelector('#image-container p').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    });
+
+    // 2. Target 폴더 선택
+    document.getElementById('buttonTarg').addEventListener('click', async () => {
+        const result = await window.api.selectFolder(); // Electron에서 폴더 선택 다이얼로그 실행
+        if (result) {
+            targDirPath = result;
+            document.getElementById('dirTarg').textContent = `Target Folder: ${result}`;
+        }
+    });
+
+    // 3. Output 폴더 선택
+    document.getElementById('buttonOut').addEventListener('click', async () => {
+        const result = await window.api.selectFolder(); // Electron에서 폴더 선택 다이얼로그 실행
+        if (result) {
+            outDirPath = result;
+            // document.getElementById('output-folder-path').textContent = `Output Folder: ${result}`;
+        }
+    });
+
+    // 4. 외부 프로그램 실행
+    document.getElementById('buttonStart').addEventListener('click', async () => {
+        if (!refImgPath || !targDirPath || !outDirPath) {
+            alert('Please select all required paths.');
+            return;
+        }
+        // 외부 프로그램 실행
+        const result = await window.api.runExternalProgram([
+            refImgPath,
+            targDirPath,
+            outDirPath,
+        ]);
+        alert(result ? 'Process completed successfully!' : 'An error occurred.');
+    });
+</script>
+</body>
+</html>
