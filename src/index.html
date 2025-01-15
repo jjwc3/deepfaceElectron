@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="./output.css" rel="stylesheet">
-    <style type="text/css">
+    <style>
         div {
             /*border: 2px solid black;*/
             display: flex;
@@ -58,25 +58,33 @@
     let outDirPath = null;  // 세 번째 인자: 출력 폴더 경로
 
     // 1. Reference 이미지 선택
-    document.getElementById('buttonRef').addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*'; // 이미지 파일만 허용
-        input.onchange = (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                refImgPath = file.path; // 경로 저장
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const imgElement = document.getElementById('imgRef');
-                    imgElement.src = e.target.result; // Base64로 미리보기
-                    imgElement.style.display = 'block';
-                    // document.querySelector('#image-container p').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        input.click();
+    document.getElementById('buttonRef').addEventListener('click', async () => {
+        // const input = document.createElement('input');
+        // input.type = 'file';
+        // input.accept = 'image/*'; // 이미지 파일만 허용
+        // input.onchange = (event) => {
+        //     const file = event.target.files[0];
+        //     if (file) {
+        //         // refImgPath = file.path; // 경로 저장
+        //         const reader = new FileReader();
+        //         reader.onload = (e) => {
+        //             const imgElement = document.getElementById('imgRef');
+        //             imgElement.src = e.target.result; // Base64로 미리보기
+        //             imgElement.style.display = 'block';
+        //             // document.querySelector('#image-container p').style.display = 'none';
+        //         };
+        //         reader.readAsDataURL(file);
+        //     }
+        // };
+        // input.click();
+        const result = await window.api.selectFile();
+        if (result) {
+            refImgPath = result;
+            const imgElement = document.getElementById('imgRef');
+            imgElement.src = result;
+            imgElement.style.display = 'block';
+            // document.getElementById('dirTarg').textContent = `Target Folder: ${result}`;
+        }
     });
 
     // 2. Target 폴더 선택
@@ -93,21 +101,28 @@
         const result = await window.api.selectFolder(); // Electron에서 폴더 선택 다이얼로그 실행
         if (result) {
             outDirPath = result;
+            document.getElementById('dirTarg').textContent += `<br>Output Folder: ${result}`;
             // document.getElementById('output-folder-path').textContent = `Output Folder: ${result}`;
         }
     });
 
     // 4. 외부 프로그램 실행
     document.getElementById('buttonStart').addEventListener('click', async () => {
+        // document.getElementById('dirTarg').textContent = `ref: ${refImgPath}<br>tar: ${targDirPath}\nout: ${outDirPath}<br>model: ${document.querySelector('#modelSelect').value}`;
+        console.log(`ref: ${refImgPath}\ntar: ${targDirPath}\nout: ${outDirPath}\nmodel: ${document.querySelector('#modelSelect').value}`);
         if (!refImgPath || !targDirPath || !outDirPath) {
             alert('Please select all required paths.');
             return;
         }
+
+        let model = document.querySelector('#modelSelect').value;
+
         // 외부 프로그램 실행
         const result = await window.api.runExternalProgram([
             refImgPath,
             targDirPath,
             outDirPath,
+            model,
         ]);
         alert(result ? 'Process completed successfully!' : 'An error occurred.');
     });
