@@ -5,7 +5,7 @@ const path = require('path');
 let mainWindow;
 
 function createWindow () {
-    const win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
@@ -14,7 +14,7 @@ function createWindow () {
             nodeIntegration: false,
         }
     });
-    win.loadFile(path.join(__dirname, 'index.html')).then(() => console.log("loaded: index.html"));
+    mainWindow.loadFile(path.join(__dirname, 'index.html')).then(() => console.log("loaded: index.html"));
 }
 
 app.whenReady().then(() => {
@@ -26,31 +26,54 @@ ipcMain.handle('run-external-program', async (event, args) => {
     console.log('start');
     const [referenceImage, targetFolder, outputFolder, model] = args;
 
-    // return new Promise((resolve, reject) => {
-    //     const { execFile } = require('child_process');
-    //     execFile(path.join(__dirname, 'faceRecognition'), [referenceImage, targetFolder, outputFolder, model], (error, stdout, stderr) => {
-    //         if (error) {
-    //             console.error('Error:', error);
-    //             reject(false);
-    //         } else {
-    //             console.log('Output:', stdout);
-    //             resolve(true);
-    //         }
-    //     });
-    // });
-
     return new Promise((resolve, reject) => {
-        const program = spawn(path.join(__dirname, 'faceRecognition'), [referenceImage, targetFolder, outputFolder, model]);
+        const program = spawn(path.join(__dirname, 'faceRecognitionUNIX'), [referenceImage, targetFolder, outputFolder, model]);
 
         // stdout 스트림 처리
         program.stdout.on('data', (data) => {
-            console.log(`STDOUT: ${data.toString()}`); // 실시간으로 콘솔에 출력
+            let output = data.toString();
+            console.log(`STDOUT: ${output}`);
+            // mainWindow.webContents.send('program-output', output);
+
+            if (output.includes('[START]')) {
+                mainWindow.webContents.send('program-output', ['start', 'Program Started.']);
+            }
+
+            if (output.includes('[ARGERROR]')) {
+                let err = output.split('[ARGERROR] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['arg_error', err]);
+            }
+
+            if (output.includes('[TARGET] ')) {
+                let targetDir = output.split('[TARGET] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['target_dir', targetDir]);
+            }
+
+            if (output.includes('[MATCH] ')) {
+                let matchName = output.split('[MATCH] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['match_name', matchName]);
+            }
+
+            if (output.includes('[SAVED] ')) {
+                let outputDir = output.split('[SAVED] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['output_dir', outputDir]);
+            }
+
+            if (output.includes('[FAIL] ')) {
+                let fail = output.split('[FAIL] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['error', fail]);
+            }
+
+            if (output.includes('[NOMATCH] ')) {
+                let noMatch = output.split('[NOMATCH] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['no_match', noMatch]);
+            }
         });
 
         // stderr 스트림 처리
         program.stderr.on('data', (data) => {
             console.error(`STDERR: ${data.toString()}`); // 에러 메시지를 콘솔에 출력
-        });
+            });
 
         // 프로세스 종료 시 결과 반환
         program.on('close', (code) => {

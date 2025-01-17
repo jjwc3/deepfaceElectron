@@ -13,33 +13,43 @@
     </style>
 </head>
 <body>
-<div id="main" class="w-full h-screen flex flex-row justify-evenly items-stretch flex-nowrap text-sm">
-    <div id="leftColumn" class="basis-4/5 flex-row">
+<div id="main" class="w-full h-screen flex flex-row justify-evenly items-stretch flex-nowrap text-sm p-4">
+    <div id="leftColumn" class="basis-4/5 flex-row mr-2">
         <div id="leftBlock" class="basis-1/2 flex-col">
-            <div id="leftTopdiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 ml-4 bg-opacity-70 transition-all">
-                <img id="imgRef" src="" alt="비교 이미지" class="max-w-full h-auto object-contain" style="display: none;">
+            <div id="leftTopdiv" class="flex-col h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 pb-4 pt-2 mr-2 mb-2 bg-opacity-70 transition-all">
+                <h1 class="text-xl text-center mb-2">비교 이미지</h1>
+                <hr>
+                <img id="imgRef" src="" alt="비교 이미지" class="max-w-full h-auto object-contain mt-2" style="display: none;">
             </div>
-            <div id="leftBottomDiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 ml-4 bg-opacity-70 transition-all">
-                <img id="imgTarg" src="" alt="대상 이미지" class="max-w-full h-auto object-contain" style="display: none;">
+            <div id="leftBottomDiv" class="flex-col h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 pb-4 pt-2 mr-2 mt-2 bg-opacity-70 transition-all">
+                <h1 class="text-xl text-center mb-2">대상 이미지</h1>
+                <hr>
+                <img id="imgTarg" src="" alt="대상 이미지" class="max-w-full max-h-full h-auto object-contain mt-2" style="display: none;">
             </div>
         </div>
         <div id="rightBlock" class="basis-1/2 flex-col">
-            <div id="rightTopDiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 bg-opacity-70 transition-all">
-                <p id="dirTarg"></p>
+            <div id="rightTopDiv" class="flex-col h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 pb-4 pt-2 ml-2 mb-2 bg-opacity-70 transition-all">
+                <h1 class="text-xl text-center mb-2">콘솔</h1>
+                <hr>
+                <div id="dirTarg" class="break-all basis-full mt-2 overflow-y-auto"></div>
             </div>
-            <div id="rightBottomDiv" class="h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 bg-opacity-70 transition-all">
-                <img id="imgCrop" src="" alt="결과 이미지" class="max-w-full h-auto object-contain" style="display: none;">
+            <div id="rightBottomDiv" class="flex-col h-1/2 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 pb-4 pt-2 ml-2 mt-2 bg-opacity-70 transition-all overflow-hidden">
+                <h1 class="text-xl text-center mb-2">결과 이미지</h1>
+                <hr>
+                <div class="flex justify-center items-center h-full">
+                    <img id="imgCrop" src="" alt="결과 이미지" class="max-w-full max-h-full h-auto object-contain mt-2" style="display: none;">
+                </div>
             </div>
 
         </div>
     </div>
-    <div id="rightColumn" class="flex-col basis-1/5 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 m-2 mr-4 bg-opacity-70 transition-all">
+    <div id="rightColumn" class="flex-col basis-1/5 border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white px-3 py-4 ml-2 bg-opacity-70 transition-all">
         <button id="buttonRef" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">비교 파일 불러오기</button>
-        <button id="buttonTarg" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">대상 파일 불러오기</button>
+        <button id="buttonTarg" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">대상 폴더 불러오기</button>
         <button id="buttonOut" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">추출 폴더 선택하기</button>
-        <button id="buttonStart" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">추출 시작</button>
-        <select class="config border rounded-sm p-2 w-full text-sm" id="modelSelect">
-            <option value="ArcFace">ArcFace(권장)</option>
+        <select class="config border p-2 w-full text-sm border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white bg-opacity-70 transition-all mb-2" id="modelSelect">
+            <option value="none" disabled>모델 선택</option>
+            <option value="ArcFace" selected>ArcFace(권장)</option>
             <option value="DeepFace">DeepFace</option>
             <option value="DeepID">DeepID</option>
             <option value="Dlib">Dlib</option>
@@ -50,6 +60,8 @@
             <option value="SFace">SFace</option>
             <option value="VGG-Face">VGG-Face</option>
         </select>
+        <button id="buttonStart" class="w-full border border-slate-100 shadow-xl ease-in-out duration-500 rounded-md bg-white py-2 mb-2 bg-opacity-70 transition-all">추출 시작</button>
+
     </div>
 </div>
 <script>
@@ -59,64 +71,47 @@
 
     // 1. Reference 이미지 선택
     document.getElementById('buttonRef').addEventListener('click', async () => {
-        // const input = document.createElement('input');
-        // input.type = 'file';
-        // input.accept = 'image/*'; // 이미지 파일만 허용
-        // input.onchange = (event) => {
-        //     const file = event.target.files[0];
-        //     if (file) {
-        //         // refImgPath = file.path; // 경로 저장
-        //         const reader = new FileReader();
-        //         reader.onload = (e) => {
-        //             const imgElement = document.getElementById('imgRef');
-        //             imgElement.src = e.target.result; // Base64로 미리보기
-        //             imgElement.style.display = 'block';
-        //             // document.querySelector('#image-container p').style.display = 'none';
-        //         };
-        //         reader.readAsDataURL(file);
-        //     }
-        // };
-        // input.click();
         const result = await window.api.selectFile();
         if (result) {
             refImgPath = result;
             const imgElement = document.getElementById('imgRef');
             imgElement.src = result;
             imgElement.style.display = 'block';
-            // document.getElementById('dirTarg').textContent = `Target Folder: ${result}`;
+            document.getElementById('dirTarg').innerHTML += `Ref Image: ${result}<br>`;
+            document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
         }
     });
 
     // 2. Target 폴더 선택
     document.getElementById('buttonTarg').addEventListener('click', async () => {
-        const result = await window.api.selectFolder(); // Electron에서 폴더 선택 다이얼로그 실행
+        const result = await window.api.selectFolder();
         if (result) {
             targDirPath = result;
-            document.getElementById('dirTarg').textContent = `Target Folder: ${result}`;
+            document.getElementById('dirTarg').innerHTML += `Target Folder: ${result}<br>`;
+            document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
         }
     });
 
     // 3. Output 폴더 선택
     document.getElementById('buttonOut').addEventListener('click', async () => {
-        const result = await window.api.selectFolder(); // Electron에서 폴더 선택 다이얼로그 실행
+        const result = await window.api.selectFolder();
         if (result) {
             outDirPath = result;
-            document.getElementById('dirTarg').textContent += `<br>Output Folder: ${result}`;
-            // document.getElementById('output-folder-path').textContent = `Output Folder: ${result}`;
+            document.getElementById('dirTarg').innerHTML += `Output Folder: ${result}<br>`;
+            document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
         }
     });
 
     // 4. 외부 프로그램 실행
     document.getElementById('buttonStart').addEventListener('click', async () => {
-        // document.getElementById('dirTarg').textContent = `ref: ${refImgPath}<br>tar: ${targDirPath}\nout: ${outDirPath}<br>model: ${document.querySelector('#modelSelect').value}`;
-        console.log(`ref: ${refImgPath}\ntar: ${targDirPath}\nout: ${outDirPath}\nmodel: ${document.querySelector('#modelSelect').value}`);
         if (!refImgPath || !targDirPath || !outDirPath) {
             alert('Please select all required paths.');
             return;
         }
 
         let model = document.querySelector('#modelSelect').value;
-
+        document.getElementById('dirTarg').innerHTML += 'Preparing... This will take a few seconds.<br>';
+        document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
         // 외부 프로그램 실행
         const result = await window.api.runExternalProgram([
             refImgPath,
@@ -126,6 +121,47 @@
         ]);
         alert(result ? 'Process completed successfully!' : 'An error occurred.');
     });
+
+    window.api.onProgramOutput((data) => {
+        // console.log(`data: ${data}`);
+
+        switch (data[0]) {
+            case 'start':
+                document.getElementById('dirTarg').innerHTML += `Process Started.<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                break;
+            case 'arg_error':
+                document.getElementById('dirTarg').innerHTML += `Argument Error. Arguments Error. 4 Arguments(reference_path, images_folder, output_folder, model) needed.<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                break;
+            case 'target_dir':
+                document.getElementById('dirTarg').innerHTML += `Target Image: ${data[1]}<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                document.getElementById('imgTarg').src = data[1];
+                document.getElementById('imgTarg').style.display = 'block';
+                break;
+            case 'match_name':
+                document.getElementById('dirTarg').innerHTML += `Target matched, cropping...<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                break;
+            case 'output_dir':
+                document.getElementById('dirTarg').innerHTML += `Cropped. Output Path: ${data[1]}<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                document.getElementById('imgCrop').src = data[1];
+                document.getElementById('imgCrop').style.display = 'block';
+                break;
+            case 'error':
+                document.getElementById('dirTarg').innerHTML += `An error occured, Stopping...<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                break;
+            case 'no_match':
+                document.getElementById('dirTarg').innerHTML += `Reference Image and Target Image doesn't match, Skipping...<br>`;
+                document.getElementById('dirTarg').scrollTop = document.getElementById('dirTarg').scrollHeight;
+                break;
+        }
+
+
+    })
 </script>
 </body>
 </html>

@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld('api', {
     runExternalProgram: async (args) => {
         return await ipcRenderer.invoke('run-external-program', args);
     },
+    onProgramOutput: (callback) => ipcRenderer.on('program-output', (event, data) => callback(data)),
 });
