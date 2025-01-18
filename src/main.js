@@ -24,10 +24,10 @@ app.whenReady().then(() => {
 // 외부 프로그램 실행 이벤트 처리
 ipcMain.handle('run-external-program', async (event, args) => {
     console.log('start');
-    const [referenceImage, targetFolder, outputFolder, model] = args;
+    const [referenceImage, targetFolder, outputFolder, model, widthTimes, heightTimes] = args;
 
     return new Promise((resolve, reject) => {
-        const program = spawn(path.join(__dirname, 'faceRecognitionUNIX'), [referenceImage, targetFolder, outputFolder, model]);
+        const program = spawn(path.join(__dirname, 'faceRecognitionUNIX'), [referenceImage, targetFolder, outputFolder, model, widthTimes, heightTimes]);
 
         // stdout 스트림 처리
         program.stdout.on('data', (data) => {
@@ -37,11 +37,6 @@ ipcMain.handle('run-external-program', async (event, args) => {
 
             if (output.includes('[START]')) {
                 mainWindow.webContents.send('program-output', ['start', 'Program Started.']);
-            }
-
-            if (output.includes('[ARGERROR]')) {
-                let err = output.split('[ARGERROR] ')[1].trim();
-                mainWindow.webContents.send('program-output', ['arg_error', err]);
             }
 
             if (output.includes('[TARGET] ')) {
@@ -72,7 +67,13 @@ ipcMain.handle('run-external-program', async (event, args) => {
 
         // stderr 스트림 처리
         program.stderr.on('data', (data) => {
-            console.error(`STDERR: ${data.toString()}`); // 에러 메시지를 콘솔에 출력
+            let output = data.toString();
+            console.error(`STDERR: ${output}`); // 에러 메시지를 콘솔에 출력
+
+            if (output.includes('[ARGERROR]')) {
+                let err = output.split('[ARGERROR] ')[1].trim();
+                mainWindow.webContents.send('program-output', ['arg_error', err]);
+            }
             });
 
         // 프로세스 종료 시 결과 반환
